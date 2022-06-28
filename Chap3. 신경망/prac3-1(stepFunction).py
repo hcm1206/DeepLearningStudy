@@ -21,7 +21,7 @@ print()
 def step_function2(x):
     # x의 넘파이 배열 원소들이 0보다 큰지 여부(Bool)를 y에 넘파이 배열로 저장
     y = x > 0
-    # y 넘파이 배열의 True 값을 1로, False 값을 0으로 형변환(Bool -> int)
+    # y 넘파이 배열의 True 값을 1로, False 값을 0으로 형변환(Bool -> int) 
     return y.astype(np.int)
 
 
