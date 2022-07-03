@@ -19,7 +19,8 @@ def get_data():
 
 # sample_weight 피클 파일에서 미리 설정된 가중치 매개변수를 딕셔너리로 불러오기
 def init_network():
-    with open("Chap3. 신경망\sample_weight.pkl", 'rb') as f:
+    # 파일 경로가 부모 디렉토리로 되어있어서 현재 디렉토리로 변경
+    with open("Chap3. 신경망/sample_weight.pkl", 'rb') as f:
         network = pickle.load(f)
     return network
 
