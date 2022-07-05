@@ -55,13 +55,14 @@ print()
 # 수치 미분(함수로 계산한 미분)과 비교하면 매우 적은 오차
 
 
-# 수치 미분값을 기울기를 구하는 함수
+# 어떤 함수(f)의 특정 지점(x)을 미분하여 기울기를 구하여 그 기울기를 가진 x에 접하는 직선의 함수를 구하는 함수
 def tangent_line(f, x):
     # x일 때의 f 함수의 미분값(기울기)를 d에 저장
     d = numerical_diff(f, x)
     print(d)
     # 미분 값을 기울기로 하는 직선 함수 구현
     y = f(x) - d*x
+    # x에서의 직선 함수 리턴(람다식)
     return lambda t: d*t + y
 
 x = np.arange(0.0,20.0,0.1)
@@ -70,6 +71,7 @@ y = function_1(x)
 plt.xlabel("x")
 plt.ylabel("f(x)")
 
+# tf에 funtion_1 함수의 x = 5에서의 직선 함수 저장
 tf = tangent_line(function_1, 5)
 # y2의 값은 x = 5일때 y의 미분값을 기울기로 하는 직선 함수의 출력값
 y2 = tf(x)
