@@ -48,6 +48,5 @@ def numerical_gradient(f, x):
         
         x[idx] = tmp_val
         it.iternext()   
-    print("finish")
         
     return grad
