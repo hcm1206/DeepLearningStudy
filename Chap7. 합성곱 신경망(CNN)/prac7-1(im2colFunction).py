@@ -19,7 +19,7 @@ print(x[1].shape)
 
 # 첫번째 데이터의 첫번째 채널(폭)의 공간 데이터(2차원 행렬) 출력
 print(x[0,0])
-
+print()
 
 
 # 합성곱 연산을 클래스로 구현
@@ -59,3 +59,50 @@ def im2col(input_data, filter_h, filter_w, stride=1, pad=0):
     return col
 
 # 이해 불가
+
+# im2col 함수를 이용하여 실제로 4차원 데이터 행렬을 2차원 행렬로 바꿔보기
+
+# 0차원(N, 데이터 수)에 1개, 1차원(C, 채널)에 3개, 2차원(H, 데이터 높이)에 7개, 3차원(W, 데이터 너비)에 7개의 0~1 사이 랜덤 실수 원소를 갖는 입력값 행렬 x1
+x1 = np.random.rand(1, 3, 7, 7)
+# im2col 함수를 이용하여 x1 입력 데이터를 높이 5, 너비 5의 필터, 스트라이드 1, 패딩 0을 적용하여 행렬로 변환
+col1 = im2col(x1, 5, 5, stride=1, pad=0)
+# 변환된 행렬의 형상 출력
+print(col1.shape)
+
+# 0차원(N, 데이터 수)에 10개, 1차원(C, 채널)에 3개, 2차원(H, 데이터 높이)에 7개, 3차원(W, 데이터 너비)에 7개의 0~1 사이 랜덤 실수 원소를 갖는 입력값 행렬 x2
+x2 = np.random.rand(10,3,7,7)
+# im2col 함수를 이용하여 x2 입력 데이터를 높이 5, 너비 5의 필터, 스트라이드 1, 패딩 0을 적용하여 행렬로 변환
+col2 = im2col(x2, 5, 5, stride=1, pad=0)
+# 변환된 행렬의 형상 출력
+print(col2.shape)
+
+# 데이터 개수(배치)가 1개일 때는 행렬 형상이 (9,75)이지만 데이터 개수(배치)가 10개일 때는 행렬 형상이 10배인 (90,75)
+
+
+# 반대로 2차원으로 변환된 행렬을 다시 4차원 행렬로 변환하는 col2im 함수 정의(역전파 계산을 위함)
+# 변환할 2차원 행렬, 입력값의 형상, 필터값 높이, 필터값 너비, 스트라이드(기본값 1), 패딩(기본값 0) 입력받음
+def col2im(col, input_shape, filter_h, filter_w, stride=1, pad=0):
+
+    # 입력값 형상으로부터 데이터의 수, 채널 수, 데이터 높이, 데이터 너비 불러옴
+    N, C, H, W = input_shape
+    # 출력값 높이 계산
+    out_h = (H + 2*pad - filter_h)//stride + 1
+    # 출력값 너비 계산
+    out_w = (W + 2*pad - filter_w)//stride + 1
+    # 행렬값을 (데이터 수, 출력값 높이, 출력값 너비, 채널 수, 필터값 높이, 필터값 너비) 형상의 6차원으로 변환한 후 (0,3,4,5,1,2)순으로 차원을 변형
+    col = col.reshape(N, out_h, out_w, C, filter_h, filter_w).transpose(0, 3, 4, 5, 1, 2)
+
+    # 출력할 4차원 데이터 형상의 행렬 생성
+    img = np.zeros((N, C, H + 2*pad + stride - 1, W + 2*pad + stride - 1))
+    # 필터값 높이만큼 반복
+    for y in range(filter_h):
+        # y값의 최대값은 y값에 (스트라이드, 출력값 높이)를 더한 값
+        y_max = y + stride*out_h
+        # 필터값 너비만큼 반복
+        for x in range(filter_w):
+            # x값의 최대값은 x값에 (스트라이드, 출력값 너비)를 더한 값
+            x_max = x + stride*out_w
+            # 
+            img[:, :, y:y_max:stride, x:x_max:stride] += col[:, :, y, x, :, :]
+    # 계산된 이미지(4차원 데이터) 행렬 리턴
+    return img[:, :, pad:H + pad, pad:W + pad]
